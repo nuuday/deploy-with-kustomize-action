@@ -17,6 +17,10 @@ inputs:
     description: 'The version of kustomize to use'
     required: true
     default: '3.8.0'
+  kubectl:
+    description: 'The version of kustomize to use'
+    required: true
+    default: '1.16.0'
 runs:
   using: 'node12'
   main: 'dist/index.js'

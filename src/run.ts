@@ -2,16 +2,17 @@ import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import YAML from 'yaml';
 import fs from 'fs'
-import {setupKustomize} from './installers'
+import {setupKustomize} from './kustomize'
+import {setupKubectl} from './kubectl'
 
 async function run() {
     const registry = core.getInput("registry", {required: true})
     const imageInputs = core.getInput("images", {required: true})
     const overlay = core.getInput("overlay", {required: true})
     const monitoring = core.getInput("monitoring")
-    const kustomizeVersion = core.getInput("kustomize")
-    
-    await setupKustomize(kustomizeVersion)
+
+    await setupKustomize(core.getInput('kustomize'))
+    await setupKubectl(core.getInput('kubectl'))
 
     await setImages(registry, imageInputs, overlay)
     await deploy()

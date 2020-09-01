@@ -3091,15 +3091,16 @@ const core = __importStar(__webpack_require__(470));
 const exec = __importStar(__webpack_require__(986));
 const yaml_1 = __importDefault(__webpack_require__(521));
 const fs_1 = __importDefault(__webpack_require__(747));
-const installers_1 = __webpack_require__(958);
+const kustomize_1 = __webpack_require__(490);
+const kubectl_1 = __webpack_require__(803);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const registry = core.getInput("registry", { required: true });
         const imageInputs = core.getInput("images", { required: true });
         const overlay = core.getInput("overlay", { required: true });
         const monitoring = core.getInput("monitoring");
-        const kustomizeVersion = core.getInput("kustomize");
-        yield installers_1.setupKustomize(kustomizeVersion);
+        yield kustomize_1.setupKustomize(core.getInput('kustomize'));
+        yield kubectl_1.setupKubectl(core.getInput('kubectl'));
         yield setImages(registry, imageInputs, overlay);
         yield deploy();
         core.info(`monitoring: ${monitoring}`);
@@ -8041,6 +8042,70 @@ exports.getState = getState;
 
 /***/ }),
 
+/***/ 490:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.setupKustomize = void 0;
+const os = __importStar(__webpack_require__(87));
+const toolCache = __importStar(__webpack_require__(533));
+const core = __importStar(__webpack_require__(470));
+const getKustomizeLink = (version) => {
+    switch (os.type()) {
+        case 'Linux':
+            return `https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${version}/kustomize_v${version}_linux_amd64.tar.gz`;
+        case 'Darwin':
+            return `https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${version}/kustomize_v${version}_darwin_amd64.tar.gz`;
+        case 'Windows_NT':
+            return `https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${version}/kustomize_v${version}_windows_amd64.tar.gz`;
+        default:
+            throw Error("Could not find correct OS");
+    }
+};
+exports.setupKustomize = (version) => __awaiter(void 0, void 0, void 0, function* () {
+    const toolName = 'kustomize';
+    let cachedToolpath = toolCache.find(toolName, version);
+    if (!cachedToolpath) {
+        const location = yield toolCache.downloadTool(getKustomizeLink(version));
+        const unzipped = yield toolCache.extractTar(location);
+        cachedToolpath = yield toolCache.cacheDir(unzipped, toolName, version);
+    }
+    core.addPath(cachedToolpath);
+});
+
+
+/***/ }),
+
 /***/ 513:
 /***/ (function(__unusedmodule, exports) {
 
@@ -11351,6 +11416,70 @@ exports.YAML = YAML;
 
 /***/ }),
 
+/***/ 803:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.setupKubectl = void 0;
+const os = __importStar(__webpack_require__(87));
+const toolCache = __importStar(__webpack_require__(533));
+const core = __importStar(__webpack_require__(470));
+const getkubectlDownloadURL = (version) => {
+    switch (os.type()) {
+        case 'Linux':
+            return `https://storage.googleapis.com/kubernetes-release/release/${version}/bin/linux/amd64/kubectl`;
+        case 'Darwin':
+            return `https://storage.googleapis.com/kubernetes-release/release/${version}/bin/darwin/amd64/kubectl`;
+        case 'Windows_NT':
+            return `https://storage.googleapis.com/kubernetes-release/release/${version}/bin/windows/amd64/kubectl.exe`;
+        default:
+            throw Error("Could not find correct OS");
+    }
+};
+exports.setupKubectl = (version) => __awaiter(void 0, void 0, void 0, function* () {
+    const toolName = 'kubectl';
+    let cachedToolpath = toolCache.find(toolName, version);
+    if (!cachedToolpath) {
+        const location = yield toolCache.downloadTool(getkubectlDownloadURL(version));
+        const unzipped = yield toolCache.extractTar(location);
+        cachedToolpath = yield toolCache.cacheDir(unzipped, toolName, version);
+    }
+    core.addPath(cachedToolpath);
+});
+
+
+/***/ }),
+
 /***/ 826:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -12165,68 +12294,6 @@ module.exports = function (object, opts) {
 
     return joined.length > 0 ? prefix + joined : '';
 };
-
-
-/***/ }),
-
-/***/ 958:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.setupKustomize = void 0;
-const os = __importStar(__webpack_require__(87));
-const toolCache = __importStar(__webpack_require__(533));
-const core = __importStar(__webpack_require__(470));
-const getKustomizeLink = (version) => {
-    switch (os.type()) {
-        case 'Linux':
-            return `https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${version}/kustomize_v${version}_linux_amd64.tar.gz`;
-        case 'Darwin':
-            return `https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${version}/kustomize_v${version}_darwin_amd64.tar.gz`;
-        case 'Windows_NT':
-        default:
-            return `https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${version}/kustomize_v${version}_windows_amd64.tar.gz`;
-    }
-};
-exports.setupKustomize = (version) => __awaiter(void 0, void 0, void 0, function* () {
-    let cachedToolpath = toolCache.find("kustomize", version);
-    if (!cachedToolpath) {
-        const location = yield toolCache.downloadTool(getKustomizeLink(version));
-        const unzipped = yield toolCache.extractTar(location);
-        cachedToolpath = yield toolCache.cacheDir(unzipped, "kustomize", version);
-    }
-    core.addPath(cachedToolpath);
-});
 
 
 /***/ }),
