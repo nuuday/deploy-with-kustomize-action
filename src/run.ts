@@ -16,12 +16,10 @@ async function run() {
 
     await setImages(registry, imageInputs, overlay)
     await deploy()
-    core.info(`monitoring: ${monitoring}`)
+    
     if (monitoring === "true") {
         await monitorDeployment()
     }
-
-    await execHelper("kubectl", ["get", "pods", "-n", "mityousee-staging"])
 }
 
 const setImages = async (registry, imageInputs, overlay) => {
@@ -55,12 +53,9 @@ const monitorDeployment = async () => {
 
     const file = fs.readFileSync(resourceLocation)
     const manifests = YAML.parseAllDocuments(file.toString('utf8'))
-    core.info(JSON.stringify(manifests))
     const deployments = manifests
         .map(x => x.toJSON())
         .filter((x: any) => x.kind === "Deployment" || x.kind === "StatefulSet" || x.kind === "DaemonSet") as any[];
-
-    core.info(JSON.stringify(deployments))
 
     for (const deployment of deployments) {
         await execHelper("kubectl", [
@@ -100,4 +95,5 @@ const execHelper = async (tool, args: string[], options: exec.ExecOptions = {}) 
 
     return exitCode
 }
+
 run().catch(core.setFailed)

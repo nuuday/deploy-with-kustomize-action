@@ -3103,11 +3103,9 @@ function run() {
         yield kubectl_1.setupKubectl(core.getInput('kubectl'));
         yield setImages(registry, imageInputs, overlay);
         yield deploy();
-        core.info(`monitoring: ${monitoring}`);
         if (monitoring === "true") {
             yield monitorDeployment();
         }
-        yield execHelper("kubectl", ["get", "pods", "-n", "mityousee-staging"]);
     });
 }
 const setImages = (registry, imageInputs, overlay) => __awaiter(void 0, void 0, void 0, function* () {
@@ -3135,11 +3133,9 @@ const monitorDeployment = () => __awaiter(void 0, void 0, void 0, function* () {
     const resourceLocation = `${process.cwd()}/resources.yaml`;
     const file = fs_1.default.readFileSync(resourceLocation);
     const manifests = yaml_1.default.parseAllDocuments(file.toString('utf8'));
-    core.info(JSON.stringify(manifests));
     const deployments = manifests
         .map(x => x.toJSON())
         .filter((x) => x.kind === "Deployment" || x.kind === "StatefulSet" || x.kind === "DaemonSet");
-    core.info(JSON.stringify(deployments));
     for (const deployment of deployments) {
         yield execHelper("kubectl", [
             "rollout",
