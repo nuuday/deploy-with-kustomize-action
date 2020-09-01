@@ -2,17 +2,21 @@ name: 'Deploy with kustomize'
 description: 'This action compiles your kustomize manifests and deploys it with kubectl'
 inputs:
   registry:
-    description: ''
-    required: true
+    description: 'Registry to the docker images'
+    required: false
   images:
-    description: ''
+    description: 'The images to edit to a new image version. Note it's currently hardcoded to change from :latest to a version you provide'
     required: false
   overlay:
-    description: ''
+    description: 'The path to the overlay to kustomize'
     required: true
   monitoring:
-    description: ''
+    description: 'Enables kubectl rollout checks on all Deployments, statefulsets and daemonsets within the compiled manifest'
     required: false
+  kustomize:
+    description: 'The version of kustomize to use'
+    required: true
+    default: 3.8.0
 runs:
   using: 'node12'
   main: 'dist/index.js'
