@@ -16,7 +16,7 @@ inputs:
   kustomize:
     description: 'The version of kustomize to use'
     required: true
-    default: 3.8.0
+    default: '3.8.0'
 runs:
   using: 'node12'
   main: 'dist/index.js'
