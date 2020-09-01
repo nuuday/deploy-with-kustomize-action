@@ -5,7 +5,7 @@ inputs:
     description: 'Registry to the docker images'
     required: false
   images:
-    description: 'The images to edit to a new image version. Note it's currently hardcoded to change from :latest to a version you provide'
+    description: 'The images to edit to a new image version. Note its currently hardcoded to change from :latest to a version you provide'
     required: false
   overlay:
     description: 'The path to the overlay to kustomize'
