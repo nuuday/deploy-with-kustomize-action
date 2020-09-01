@@ -11457,22 +11457,22 @@ const core = __importStar(__webpack_require__(470));
 const getkubectlDownloadURL = (version) => {
     switch (os.type()) {
         case 'Linux':
-            return `https://storage.googleapis.com/kubernetes-release/release/${version}/bin/linux/amd64/kubectl`;
+            return `https://storage.googleapis.com/kubernetes-release/release/v${version}/bin/linux/amd64/kubectl`;
         case 'Darwin':
-            return `https://storage.googleapis.com/kubernetes-release/release/${version}/bin/darwin/amd64/kubectl`;
+            return `https://storage.googleapis.com/kubernetes-release/release/v${version}/bin/darwin/amd64/kubectl`;
         case 'Windows_NT':
-            return `https://storage.googleapis.com/kubernetes-release/release/${version}/bin/windows/amd64/kubectl.exe`;
+            return `https://storage.googleapis.com/kubernetes-release/release/v${version}/bin/windows/amd64/kubectl.exe`;
         default:
             throw Error("Could not find correct OS");
     }
 };
+const getToolWithExtension = (toolName) => os.type() == 'Windows_NT' ? `${toolName}.exe` : toolName;
 exports.setupKubectl = (version) => __awaiter(void 0, void 0, void 0, function* () {
     const toolName = 'kubectl';
     let cachedToolpath = toolCache.find(toolName, version);
     if (!cachedToolpath) {
         const location = yield toolCache.downloadTool(getkubectlDownloadURL(version));
-        const unzipped = yield toolCache.extractTar(location);
-        cachedToolpath = yield toolCache.cacheDir(unzipped, toolName, version);
+        cachedToolpath = yield toolCache.cacheFile(location, getToolWithExtension(toolName), toolName, version);
     }
     core.addPath(cachedToolpath);
 });
