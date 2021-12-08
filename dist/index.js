@@ -3240,9 +3240,13 @@ function run() {
         const imageInputs = core.getInput("images", { required: true });
         const overlay = core.getInput("overlay", { required: true });
         const monitoring = core.getInput("monitoring");
+        const namesuffix = core.getInput("namesuffix");
         yield kustomize_1.setupKustomize(core.getInput('kustomize'));
         yield kubectl_1.setupKubectl(core.getInput('kubectl'));
         yield setImages(registry, imageInputs, overlay);
+        if (namesuffix) {
+            yield setNameSuffix(namesuffix, overlay);
+        }
         yield deploy();
         if (monitoring === "true") {
             yield monitorDeployment();
@@ -3258,6 +3262,9 @@ const setImages = (registry, imageInputs, overlay) => __awaiter(void 0, void 0, 
         const current = `${registry}/${image}`;
         yield runKustomize(overlay, ["edit", "set", "image", `${latest}=${current}`]);
     }
+});
+const setNameSuffix = (nameSuffix, overlay) => __awaiter(void 0, void 0, void 0, function* () {
+    yield runKustomize(overlay, ["edit", "set", "namesuffix", "--", `-${nameSuffix}`]);
 });
 const deploy = () => __awaiter(void 0, void 0, void 0, function* () {
     const overlay = core.getInput("overlay");
