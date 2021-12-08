@@ -16,11 +16,15 @@ inputs:
   kustomize:
     description: 'The version of kustomize to use'
     required: true
-    default: '3.8.0'
+    default: '4.4.1'
   kubectl:
     description: 'The version of kustomize to use'
     required: true
-    default: '1.16.0'
+    default: '1.20.9'
+  namesuffix:
+    description: 'Add suffix to all resources'
+    required: false
+    default: ''
 runs:
   using: 'node12'
   main: 'dist/index.js'

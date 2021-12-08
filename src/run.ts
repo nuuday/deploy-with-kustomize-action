@@ -10,11 +10,15 @@ async function run() {
     const imageInputs = core.getInput("images", {required: true})
     const overlay = core.getInput("overlay", {required: true})
     const monitoring = core.getInput("monitoring")
+    const namesuffix = core.getInput("namesuffix")
 
     await setupKustomize(core.getInput('kustomize'))
     await setupKubectl(core.getInput('kubectl'))
 
     await setImages(registry, imageInputs, overlay)
+    if (namesuffix) {
+        await setNameSuffix(namesuffix, overlay)
+    }
     await deploy()
     
     if (monitoring === "true") {
@@ -32,6 +36,10 @@ const setImages = async (registry, imageInputs, overlay) => {
 
         await runKustomize(overlay, ["edit", "set", "image", `${latest}=${current}`])
     }
+}
+
+const setNameSuffix = async (nameSuffix, overlay) => {
+    await runKustomize(overlay, ["edit", "set", "namesuffix", "--", `-${nameSuffix}`])
 }
 
 const deploy = async () => {
