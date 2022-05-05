@@ -8208,6 +8208,8 @@ exports.setupKustomize = void 0;
 const os = __importStar(__webpack_require__(87));
 const toolCache = __importStar(__webpack_require__(533));
 const core = __importStar(__webpack_require__(470));
+const path = __importStar(__webpack_require__(622));
+const fs = __importStar(__webpack_require__(747));
 const getKustomizeLink = (version) => {
     switch (os.type()) {
         case 'Linux':
@@ -8220,6 +8222,7 @@ const getKustomizeLink = (version) => {
             throw Error("Could not find correct OS");
     }
 };
+const getToolWithExtension = (toolName) => os.type() == 'Windows_NT' ? `${toolName}.exe` : toolName;
 exports.setupKustomize = (version) => __awaiter(void 0, void 0, void 0, function* () {
     const toolName = 'kustomize';
     let cachedToolpath = toolCache.find(toolName, version);
@@ -8228,6 +8231,8 @@ exports.setupKustomize = (version) => __awaiter(void 0, void 0, void 0, function
         const unzipped = yield toolCache.extractTar(location);
         cachedToolpath = yield toolCache.cacheDir(unzipped, toolName, version);
     }
+    const kustomizePath = path.join(cachedToolpath, getToolWithExtension(toolName));
+    fs.chmodSync(kustomizePath, '777');
     core.addPath(cachedToolpath);
 });
 
@@ -11645,6 +11650,8 @@ exports.setupKubectl = void 0;
 const os = __importStar(__webpack_require__(87));
 const toolCache = __importStar(__webpack_require__(533));
 const core = __importStar(__webpack_require__(470));
+const path = __importStar(__webpack_require__(622));
+const fs = __importStar(__webpack_require__(747));
 const getkubectlDownloadURL = (version) => {
     switch (os.type()) {
         case 'Linux':
@@ -11665,6 +11672,8 @@ exports.setupKubectl = (version) => __awaiter(void 0, void 0, void 0, function* 
         const location = yield toolCache.downloadTool(getkubectlDownloadURL(version));
         cachedToolpath = yield toolCache.cacheFile(location, getToolWithExtension(toolName), toolName, version);
     }
+    const kubectlPath = path.join(cachedToolpath, getToolWithExtension(toolName));
+    fs.chmodSync(kubectlPath, '777');
     core.addPath(cachedToolpath);
 });
 
