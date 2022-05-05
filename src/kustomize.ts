@@ -1,6 +1,8 @@
 import * as os from 'os';
 import * as toolCache from '@actions/tool-cache'
 import * as core from '@actions/core'
+import * as path from 'path';
+import * as fs from 'fs';
 
 const getKustomizeLink = (version: string): string => {
     switch (os.type()) {
@@ -16,6 +18,8 @@ const getKustomizeLink = (version: string): string => {
     }
 }
 
+const getToolWithExtension = (toolName) => os.type() == 'Windows_NT' ? `${toolName}.exe` : toolName;
+
 export const setupKustomize = async (version) => {
     const toolName = 'kustomize';
     
@@ -25,6 +29,9 @@ export const setupKustomize = async (version) => {
         const unzipped = await toolCache.extractTar(location);
         cachedToolpath = await toolCache.cacheDir(unzipped, toolName, version)
     }
+
+    const kustomizePath = path.join(cachedToolpath, getToolWithExtension(toolName));
+    fs.chmodSync(kustomizePath, '777');
 
     core.addPath(cachedToolpath)
 }
