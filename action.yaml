@@ -20,7 +20,7 @@ inputs:
   kubectl:
     description: 'The version of kustomize to use'
     required: true
-    default: '1.20.9'
+    default: '1.23.6'
   namesuffix:
     description: 'Add suffix to all resources'
     required: false

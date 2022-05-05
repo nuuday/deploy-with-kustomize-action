@@ -11645,6 +11645,8 @@ exports.setupKubectl = void 0;
 const os = __importStar(__webpack_require__(87));
 const toolCache = __importStar(__webpack_require__(533));
 const core = __importStar(__webpack_require__(470));
+const path = __importStar(__webpack_require__(622));
+const fs = __importStar(__webpack_require__(747));
 const getkubectlDownloadURL = (version) => {
     switch (os.type()) {
         case 'Linux':
@@ -11665,6 +11667,8 @@ exports.setupKubectl = (version) => __awaiter(void 0, void 0, void 0, function* 
         const location = yield toolCache.downloadTool(getkubectlDownloadURL(version));
         cachedToolpath = yield toolCache.cacheFile(location, getToolWithExtension(toolName), toolName, version);
     }
+    const kubectlPath = path.join(cachedToolpath, getToolWithExtension(toolName));
+    fs.chmodSync(kubectlPath, '777');
     core.addPath(cachedToolpath);
 });
 

@@ -1,6 +1,9 @@
 import * as os from 'os';
 import * as toolCache from '@actions/tool-cache'
 import * as core from '@actions/core'
+import * as path from 'path';
+import * as fs from 'fs';
+
 
 const getkubectlDownloadURL = (version: string): string => {
     switch (os.type()) {
@@ -26,6 +29,9 @@ export const setupKubectl = async (version) => {
         const location = await toolCache.downloadTool(getkubectlDownloadURL(version));
         cachedToolpath = await toolCache.cacheFile(location, getToolWithExtension(toolName), toolName, version)
     }
+
+    const kubectlPath = path.join(cachedToolpath, getToolWithExtension(toolName));
+    fs.chmodSync(kubectlPath, '777');
 
     core.addPath(cachedToolpath)
 }
